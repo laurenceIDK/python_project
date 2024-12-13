@@ -15,7 +15,7 @@ class gui_todolist:
 
         self.master = master
         self.master.title('To-do List')
-        self.master.geometry('+350+100')
+        self.master.geometry('+500+90')
         self.master.resizable(False, False)
 
         #Try opening the file to check if it exists
@@ -288,15 +288,7 @@ class gui_todolist:
         total = self.count_pending + self.count_completed
         self.total_task_lbl.config(text=f'Total Tasks: {total}')
 
-class time_count:
-    def __init__(self, master):
-        self.master = master
 
-#Main Function
-def main():
-    main = Tk()
-    gui = gui_todolist(main)
-    print('To-do List Manager Program')
-    main.mainloop()
-
-main()
+def todo_start():
+    main_todo = Toplevel()
+    gui = gui_todolist(main_todo)
