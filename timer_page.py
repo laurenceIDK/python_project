@@ -20,6 +20,14 @@ class timerrun:
         self.paused_time = 0
         self.timers_file = "timers.txt"
 
+        try:
+            open('timers.txt', 'r')
+        except FileNotFoundError:
+            messagebox.showerror("Error", "Timers file not found. A new file created.")
+            with open('timers.txt', 'w') as file:
+                file.write("")
+
+
         Label(root, font=("arial", 20, "bold"), text="Timer", bg="#FAF3E0", fg="#333333").pack(pady=10)
         self.current_time = Label(root, font=("arial", 15, "bold"), text="", fg="#333333", bg="#FAF3E0", width=12)
         self.current_time.pack(pady=5)
@@ -61,7 +69,14 @@ class timerrun:
     def start_timer(self):
         if not self.timer_running:
             self.timer_running = True
-            countdown = int(self.hrs.get()) * 3600 + int(self.mins.get()) * 60 + int(self.secs.get())
+
+            try:
+                countdown = int(self.hrs.get()) * 3600 + int(self.mins.get()) * 60 + int(self.secs.get())
+            except ValueError:
+                messagebox.showerror("Error", "Invalid input. Please enter a valid time.")
+                self.timer_running = False
+                return
+            
             self.countdown(countdown)
 
     def countdown(self, time_left):
