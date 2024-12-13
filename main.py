@@ -4,8 +4,7 @@ from tkcalendar import *
 from datetime import *
 
 from todo_page import *
-from timer_page2 import *
-from fquiz_page import *
+from timer_page import *
 
 class home_page:
     def __init__(self, home):
