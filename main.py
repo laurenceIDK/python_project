@@ -54,7 +54,7 @@ class home_page:
         timer_start()
     
     def fquiz_page(self, event=None):
-        import fquiz_page
+        pass
 
 
 def main():
