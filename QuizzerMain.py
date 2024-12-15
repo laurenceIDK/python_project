@@ -245,13 +245,18 @@ class flashcardQuizzer:
         attempted = self.progress["attempted"]  #number of attempted answer of quizzes (note: not "no of quiz attempted" but "no of attempted")
         correct = self.progress["correct"]      #number of correct attempt
 
-        tk.Label(self.root, text=f"Total Quiz Created: {total_quiz}", font=arial_round, bg="#4ccfdd", relief="groove", bd=3, padx=7, pady=5).pack(pady=10)
-        frame = tk.Frame(self.root)
-        frame.pack(pady=10)
-        tk.Label(frame, text=f"No of Attempted: {attempted}", font=arial_round, bg="#f7d058", relief="groove", bd=3, padx=7, pady=5).pack(side="left")
-        tk.Label(frame, text=f"Answered Correct: {correct}", font=arial_round, bg="#49a64e", relief="groove", bd=3, padx=7, pady=5).pack(side="left")
-        tk.Label(self.root, text=f"Accuracy: {correct / attempted * 100:.2f}%" if attempted > 0 else "Accuracy: N/A", font=arial_round, bg="#f76767", relief="groove", bd=3, padx=7, pady=5).pack(pady=10)
-        tk.Button(self.root, text="Back to Flashcard Quizzer Menu", font=arial_round, bg='#fc0000', activebackground='#0ee832', relief='raised', bd=5, padx=7, pady=3, command=self.main_menu).pack(pady=20)
+        tk.Label(self.root, text=f"Total Quiz Created: {total_quiz}", font=arial_round, bg="#4ccfdd", relief="groove", bd=3, padx=7, pady=5).pack(pady=20)
+        big_frame = tk.Frame(self.root)
+        big_frame.pack(pady=30)
+        frame1 = tk.Frame(big_frame)
+        frame1.pack(fill='x', padx=10, pady=5)
+        frame2 = tk.Frame(big_frame)
+        frame2.pack(fill='x', padx=15, pady=5)
+        tk.Label(frame1, text=f"No of Attempted: {attempted}", font=arial_round, bg="#f7d058", relief="groove", bd=3, padx=7, pady=5).pack(side="left", padx=5)
+        tk.Label(frame1, text=f"Answered Correct: {correct}", font=arial_round, bg="#49a64e", relief="groove", bd=3, padx=7, pady=5).pack(side="right", padx=5)
+        tk.Label(frame2, text=f"Accuracy: {correct / attempted * 100:.2f}%" if attempted > 0 else "Accuracy: N/A", font=arial_round, bg="#f76767", relief="groove", bd=3, padx=7, pady=5).pack(fill='x')
+        tk.Button(self.root, text="Reset Progress", font=arial_round, bg='#fc0000', activebackground='#0ee832', relief="solid", bd=3, padx=7, pady=3, command=self.reset_progress).pack(pady=20)
+        tk.Button(self.root, text="Back to Flashcard Quizzer Menu", font=arial_round, bg='#fc0000', activebackground='#0ee832', relief='raised', bd=5, padx=7, pady=3, command=self.main_menu).pack(pady=30)
 
     def save_quiz_file(self):
         with open(self.quiz_file, 'w') as file:
@@ -285,6 +290,18 @@ class flashcardQuizzer:
                     self.progress["correct"] = int(lines[1].strip())
         except FileNotFoundError:
             self.progress = {"attempted": 0, "correct": 0}
+
+    def reset_progress(self):
+        #double confirmation to prevent accidental reset of progress
+        res = mb.askyesno("Reset progress confirmation", "Do you sure you want to reset your progress?")
+        if res:
+            self.progress["attempted"] = 0
+            self.progress["correct"] = 0
+            self.save_progress_file()
+            mb.showinfo("Success", "Progress reset succesfully!")
+            self.track_progress()
+        else:
+            return
 
     def clear_window(self):
         #function to clear the window
