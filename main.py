@@ -5,6 +5,7 @@ from datetime import *
 
 from todo_page import *
 from timer_page import *
+from fquiz_page import *
 
 class home_page:
     def __init__(self, home):
@@ -53,7 +54,7 @@ class home_page:
         timer_start()
     
     def fquiz_page(self, event=None):
-        pass
+        fquiz_start()
 
 
 def main():
