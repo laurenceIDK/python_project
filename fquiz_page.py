@@ -34,7 +34,7 @@ class flashcardQuizzer:
         tk.Button(btn_frame, text="Study Quiz", font=arial_round, bg='#d19711', activebackground='#0ee832', relief="sunken", bd=5, padx=7, pady=3, command=self.study_quiz).pack(pady=10, fill='x')
         tk.Button(btn_frame, text="Edit/Delete Quiz", font=arial_round, bg='#d19711', activebackground='#0ee832', relief="sunken", bd=5, padx=7, pady=3, command=self.edit_del_quiz).pack(pady=10, fill='x')
         tk.Button(btn_frame, text="Track Progress", font=arial_round, bg='#d19711', activebackground='#0ee832', relief="sunken", bd=5, padx=7, pady=3, command=self.track_progress).pack(pady=10, fill='x')
-        tk.Button(btn_frame, text="Back to Main Menu", font=arial_round, bg='#fc0000', activebackground='#0ee832', relief='raised', bd=5, padx=7, pady=3).pack(pady=10, fill='x')
+        tk.Button(btn_frame, text="Back to Main Menu", font=arial_round, bg='#fc0000', activebackground='#0ee832', relief='raised', bd=5, padx=7, pady=3, command=lambda: self.root.destroy()).pack(pady=10, fill='x')
 
     def form_quiz(self, quiz_idx = None, quiz_data = None):
         #function to form a quiz form (for create quiz and edit quiz)
