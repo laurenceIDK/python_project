@@ -1,15 +1,15 @@
-from tkinter import *
 import time
+from tkinter import *
 from tkinter import simpledialog
 from tkinter import messagebox
 import os
 
 # Initialize the main application window
-root = Tk()
-root.title("Timer App")
-root.geometry("500x700")
-root.config(bg="#FAF3E0")
-root.resizable(False, False)
+win = Tk()
+win.title("Timer App")
+win.geometry("500x700")
+win.config(bg="#FAF3E0")
+win.resizable(False, False)
 
 # Variables
 hrs = StringVar(value="00")
@@ -25,17 +25,22 @@ def clock():
     current_time.config(text=clock_time)
     current_time.after(1000, clock)
 
-Label(root, font=("arial", 20, "bold"), text="Timer", bg="#FAF3E0", fg="#333333").pack(pady=10)
-current_time = Label(root, font=("arial", 15, "bold"), text="", fg="#333333", bg="#FAF3E0", width=12)
+Label(win, font=("arial", 20, "bold"), text="Timer", bg="#FAF3E0", fg="#333333").pack(pady=10)
+current_time = Label(win, font=("arial", 15, "bold"), text="", fg="#333333", bg="#FAF3E0", width=12)
 current_time.pack(pady=5)
 clock()
 
+#function for validating input (only integers.)
+def validate_input(newInput):
+    return newInput.isdigit() or newInput == ""
+
 # Timer input fields
-timer_frame = Frame(root, bg="#FAF3E0")
+vcmd = win.register(validate_input) # Register the validation function with Tkinter
+timer_frame = Frame(win, bg="#FAF3E0")
 timer_frame.pack(pady=20)
-Entry(timer_frame, textvariable=hrs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0).grid(row=0, column=0, padx=10)
-Entry(timer_frame, textvariable=mins, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0).grid(row=0, column=1, padx=10)
-Entry(timer_frame, textvariable=secs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0).grid(row=0, column=2, padx=10)
+Entry(timer_frame, textvariable=hrs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=0, padx=10)
+Entry(timer_frame, textvariable=mins, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=1, padx=10)
+Entry(timer_frame, textvariable=secs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=2, padx=10)
 Label(timer_frame, text="hours", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=0)
 Label(timer_frame, text="mins", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=1)
 Label(timer_frame, text="secs", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=2)
@@ -63,7 +68,7 @@ def countdown(time_left):
     if time_left == 0:
         timer_alert()  # Trigger alert
     else:
-        root.after(1000, lambda: countdown(time_left - 1))
+        win.after(1000, lambda: countdown(time_left - 1))
 
 def pause_timer():
     global timer_running, paused_time
@@ -113,16 +118,16 @@ def load_timer(h, m, s):
     secs.set(s)
 
 # Presets area
-saved_timers_frame = Frame(root, bg="#FAF3E0")
+saved_timers_frame = Frame(win, bg="#FAF3E0")
 saved_timers_frame.pack(pady=10)
 load_saved_timers()
 
 # Buttons
-button_frame = Frame(root, bg="#FAF3E0")
+button_frame = Frame(win, bg="#FAF3E0")
 button_frame.pack(pady=20)
-Button(button_frame, text="Start", bg="#A1CDA8", fg="#333333", width=10, height=2, command=start_timer).grid(row=0, column=0, padx=5)
-Button(button_frame, text="Pause", bg="#FFABAB", fg="#333333", width=10, height=2, command=pause_timer).grid(row=0, column=1, padx=5)
-Button(button_frame, text="Reset", bg="#FFD6A5", fg="#333333", width=10, height=2, command=reset_timer).grid(row=0, column=2, padx=5)
-Button(button_frame, text="Save Timer", bg="#FFE6A7", fg="#333333", width=10, height=2, command=save_timer).grid(row=0, column=3, padx=5)
+Button(button_frame, text="Start", font=("arial", 9, "bold"), bg="#A1CDA8", fg="#333333", width=10, height=2, command=start_timer).grid(row=0, column=0, padx=5)
+Button(button_frame, text="Pause", font=("arial", 9, "bold"), bg="#FFABAB", fg="#333333", width=10, height=2, command=pause_timer).grid(row=0, column=1, padx=5)
+Button(button_frame, text="Reset", font=("arial", 9, "bold"), bg="#FFD6A5", fg="#333333", width=10, height=2, command=reset_timer).grid(row=0, column=2, padx=5)
+Button(button_frame, text="Save Timer", font=("arial", 9, "bold"), bg="#FFE6A7", fg="#333333", width=10, height=2, command=save_timer).grid(row=0, column=3, padx=5)
 
-root.mainloop()
+win.mainloop()
