@@ -13,14 +13,6 @@ class home_page:
         self.home.title('Home Page')
         self.home.resizable(False, False)
         self.home.geometry('+200+90')
-        
-        try:
-            open('login_user.txt', 'r')
-        except FileNotFoundError:
-            with open ('login_user.txt', 'w') as file:
-                file.writelines('')
-            print('File login_user.txt created.')
-                
 
         self.home_title()
         self.home_widgets()
@@ -31,7 +23,7 @@ class home_page:
         title_lbl = Label(self.home, text='Home Page', font=('Arial Bold', 21), fg='black')
         title_lbl.pack(padx=(20,0), pady=(20,0), anchor='w')
         subtitle_lbl = Label(self.home, text='Please select an application', font=('Arial', 15), fg='grey')
-        subtitle_lbl.pack(padx=(20,0), pady=(5,0), anchor='w')
+        subtitle_lbl.pack(padx=20, pady=(5,0), anchor='w')
 
 
     def home_widgets(self):
@@ -64,3 +56,4 @@ def main():
 home = Tk()
 main()
 home.mainloop()
+
