@@ -9,9 +9,8 @@ class gui_todolist:
     #Function Flow of To-do List Manager Program
     def __init__(self, master):
 
-        self.file_header = ['title', 'priority', 'description', 'reminder']
-        self.count_pending = 0
-        self.count_completed = 0
+        self._count_pending = 0
+        self._count_completed = 0
 
         self.master = master
         self.master.title('To-do List')
@@ -50,6 +49,8 @@ class gui_todolist:
     def widgets(self):
         self.widgets_frame = Frame(self.master)
         self.widgets_frame.pack(padx=20, pady=(10,10), fill=X)
+        self.widgets_frame.columnconfigure(4, weight=1)
+
         add_task_btn = Button(self.widgets_frame, text='Add Task', command=self.add_task)
         add_task_btn.grid(column=0, row=0, padx=10)
 
@@ -58,6 +59,9 @@ class gui_todolist:
 
         delete_task_btn = Button(self.widgets_frame, text='Delete Task', bg='red', activebackground='pink', command=self.delete_task)
         delete_task_btn.grid(column=1, row=0, padx=10)
+
+        exit_btn = Button(self.widgets_frame, text=' X ', bg='pink', command= lambda: self.master.destroy())
+        exit_btn.grid(column=5, row=0, padx=10, sticky='E')
 
         checked_btn = Button(self.master, text='\u2713', bg='green', activebackground='lightgreen', command=self.mark_task)
         checked_btn.pack(pady=(0,20), side='bottom')
@@ -100,7 +104,7 @@ class gui_todolist:
 #Running Functionalities
     #Load Task
     def load_task(self):
-        self.count_pending = 0
+        self._count_pending = 0
         for row in self.table_view.get_children():
             self.table_view.delete(row)
 
@@ -113,8 +117,8 @@ class gui_todolist:
                         if row:
                             data = row.split('|')
                             self.table_view.insert('', 'end', values=data)
-                            self.count_pending += 1
-                            self.pending_task.config(text=f'Pending Tasks: {self.count_pending}')
+                            self._count_pending += 1
+                            self.pending_task.config(text=f'Pending Tasks: {self._count_pending}')
             else:
                 self.pending_task.config(text='Pending Tasks: 0')
         self.load_total()
@@ -124,7 +128,7 @@ class gui_todolist:
         self.add_task_form = Toplevel()
         self.add_task_form.title('Add Task')
         
-        def confirmation():
+        def confirmation(event=None):
             task_title = task_title_entry.get()
             task_priority = task_priority_list.get()
             task_description = task_description_entry.get('1.0','end').strip()
@@ -141,11 +145,25 @@ class gui_todolist:
                 self.add_task_form.destroy()
                 self.p_add_task(task_title, task_priority, task_description, task_reminder)
 
+        def not_focus(event):
+            if not task_title_entry.get():
+                task_title_entry.insert(0, 'Insert task title here...')
+                task_title_entry.configure(fg='gray')
+
+        def on_focus(event):
+            if task_title_entry.get() == 'Insert task title here...':
+                task_title_entry.delete(0, END)
+                task_title_entry.configure(fg='black')
 
         task_title_lbl = Label(self.add_task_form, text='Task Title: ')
         task_title_lbl.grid(row=0, column=0, sticky='w', padx=(20,0), pady=(10,0)) 
         task_title_entry = Entry(self.add_task_form, width=30)
         task_title_entry.grid(row=0, column=1, sticky='w', columnspan=2)
+        task_title_entry.insert(0, 'Insert task title here...')
+        task_title_entry.configure(fg='gray')
+
+        task_title_entry.bind("<FocusIn>", on_focus)
+        task_title_entry.bind("<FocusOut>", not_focus)
 
         task_priority_lbl = Label(self.add_task_form, text='Priority: ')
         task_priority_lbl.grid(row=1, column=0, sticky='w', padx=(20,0), pady=(10,0))
@@ -169,6 +187,8 @@ class gui_todolist:
         task_description_lbl.grid(row=4, column=0, sticky='w', padx=(20,0), pady=(10,0))
         task_description_entry = Text(self.add_task_form, width=50, height=5)
         task_description_entry.grid(row=5, column=0, columnspan=2, padx=20, pady=(10,20))
+
+        self.add_task_form.bind('<Return>', confirmation)
 
         add_task_submit = Button(self.add_task_form, text='Submit', command=confirmation)
         add_task_submit.grid(row=6, column=0, columnspan=2, pady=(0,10))
@@ -214,12 +234,16 @@ class gui_todolist:
         self.history_tree.column('Priority', width=100, anchor='center')
         self.history_tree.column('Description', width=300, anchor='w') 
 
-        self.history_tree.pack(padx=20, pady=20, fill=BOTH)
+        self.history_tree.pack(padx=20, pady=(20,10), fill=BOTH)
+
+        self.clear_history = Button(self.history_frame, text='Clear History', command=self.p_clear_history)
+        self.clear_history.pack(pady=(10,20), anchor='center')
+
         self.p_history_pg()
 
     #Load History
     def load_history(self):
-        self.count_completed = 0
+        self._count_completed = 0
         with open ('completedtask.txt', 'r') as file:
             text = file.read()
         
@@ -229,15 +253,15 @@ class gui_todolist:
                     row = row.strip()
                     if row:
                         data = row.split('|')
-                        self.count_completed += 1
-                        self.completed_task_lbl.config(text=f'Completed Tasks: {self.count_completed}')
+                        self._count_completed += 1
+                        self.completed_task_lbl.config(text=f'Completed Tasks: {self._count_completed}')
         else:
             self.completed_task_lbl.config(text='Completed Tasks: 0')
         self.load_total()
 
     #Load History Page
     def p_history_pg(self):
-        self.count_completed = 0
+        self._count_completed = 0
         with open ('completedtask.txt', 'r') as file:
             text = file.read()
         
@@ -248,8 +272,8 @@ class gui_todolist:
                     if row:
                         data = row.split('|')
                         self.history_tree.insert('', 'end', values=data)
-                        self.count_completed += 1
-                        self.completed_task_lbl.config(text=f'Completed Tasks: {self.count_completed}')
+                        self._count_completed += 1
+                        self.completed_task_lbl.config(text=f'Completed Tasks: {self._count_completed}')
         else:
             self.completed_task_lbl.config(text='Completed Tasks: 0')
 
@@ -285,9 +309,18 @@ class gui_todolist:
 
     #Load Total Page
     def load_total(self):
-        total = self.count_pending + self.count_completed
+        total = self._count_pending + self._count_completed
         self.total_task_lbl.config(text=f'Total Tasks: {total}')
 
+    
+    def p_clear_history(self):
+        confirm = messagebox.askyesno('Confirmation', 'Are you sure you want to clear the history?')
+        if confirm == True:
+            with open('completedtask.txt', 'w') as file:
+                file.write('')
+            self.load_history()
+            self.p_history_pg()
+            self.history_tree.delete(*self.history_tree.get_children())
 
 def todo_start():
     main_todo = Toplevel()

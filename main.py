@@ -25,7 +25,6 @@ class home_page:
         subtitle_lbl = Label(self.home, text='Please select an application', font=('Arial', 15), fg='grey')
         subtitle_lbl.pack(padx=20, pady=(5,0), anchor='w')
 
-
     def home_widgets(self):
         self.frame_widget = Frame(self.home, background='lightblue')
         self.frame_widget.pack(padx=20, pady=20, anchor='w')
