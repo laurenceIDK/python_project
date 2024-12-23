@@ -136,14 +136,16 @@ class gui_todolist:
 
             confirm = messagebox.askyesno('Confirmation Task', f'Task Title: {task_title}\nPriority: {task_priority}\nReminder: {task_reminder}\nDescription: {task_description}')
 
-            if confirm == True and (task_title == '' or task_priority == 'Select an option' or re.search('Select an option', task_reminder)):
+            if confirm == True and (task_title == 'Insert task title here...' or task_priority == 'Select an option' or re.search('Select an option', task_reminder)):
                 messagebox.showwarning('Incomplete Task', 'Task title, priority, and reminder are required fields.\nPlease refill again!')
                 self.add_task_form.focus()
             elif confirm == False: 
                 self.add_task_form.destroy()
             else:
                 self.add_task_form.destroy()
+                messagebox.showinfo('Add Task Successfully', 'Task added Successfully!')
                 self.p_add_task(task_title, task_priority, task_description, task_reminder)
+                
 
         def not_focus(event):
             if not task_title_entry.get():
