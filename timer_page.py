@@ -1,143 +1,165 @@
-from tkinter import *
-from tkinter import simpledialog, messagebox
 import time
+from tkinter import *
+from tkinter import simpledialog
+from tkinter import messagebox
 import os
 
-class timerrun:
-    def __init__(self, root):
-        # Initialize the main application window
-        self.root = root
-        self.root.title('Timer App')
-        self.root.geometry('500x500+500+90')
-        self.root.config(bg='#FAF3E0')
-        self.root.resizable(False, False)
+timer_running = False
+paused_time = 0
 
-        # Variables
-        self.hrs = StringVar(value="00")
-        self.mins = StringVar(value="00")
-        self.secs = StringVar(value="00")
-        self.timer_running = False
-        self.paused_time = 0
-        self.timers_file = "timers.txt"
+def timer_start():
 
-        try:
-            open('timers.txt', 'r')
-        except FileNotFoundError:
-            messagebox.showerror("Error", "Timers file not found. A new file created.")
-            with open('timers.txt', 'w') as file:
-                file.write("")
+    # Initialize the main application window
+    win = Toplevel()
+    win.title("Timer App")
+    win.geometry("500x500+550+90")
+    win.config(bg="#FAF3E0")
+    win.resizable(False, False)
 
-
-        Label(root, font=("arial", 20, "bold"), text="Timer", bg="#FAF3E0", fg="#333333").pack(pady=10)
-        self.current_time = Label(root, font=("arial", 15, "bold"), text="", fg="#333333", bg="#FAF3E0", width=12)
-        self.current_time.pack(pady=5)
-        self.clock()
-
-        # Timer input fields
-        timer_frame = Frame(root, bg="#FAF3E0")
-        timer_frame.pack(pady=20)
-        Entry(timer_frame, textvariable=self.hrs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0).grid(row=0, column=0, padx=10)
-        Entry(timer_frame, textvariable=self.mins, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0).grid(row=0, column=1, padx=10)
-        Entry(timer_frame, textvariable=self.secs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0).grid(row=0, column=2, padx=10)
-        Label(timer_frame, text="hours", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=0)
-        Label(timer_frame, text="mins", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=1)
-        Label(timer_frame, text="secs", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=2)
-
-        # Presets area
-        self.saved_timers_frame = Frame(root, bg="#FAF3E0")
-        self.saved_timers_frame.pack(pady=10)
-        self.load_saved_timers()
-
-        # Buttons
-        button_frame = Frame(root, bg="#FAF3E0")
-        button_frame.pack(pady=20)
-        Button(button_frame, text="Start", bg="#A1CDA8", fg="#333333", width=10, height=2, command=self.start_timer).grid(row=0, column=0, padx=5)
-        Button(button_frame, text="Pause", bg="#FFABAB", fg="#333333", width=10, height=2, command=self.pause_timer).grid(row=0, column=1, padx=5)
-        Button(button_frame, text="Reset", bg="#FFD6A5", fg="#333333", width=10, height=2, command=self.reset_timer).grid(row=0, column=2, padx=5)
-        Button(button_frame, text="Save Timer", bg="#FFE6A7", fg="#333333", width=10, height=2, command=self.save_timer).grid(row=0, column=3, padx=5)
+    # Variables
+    hrs = StringVar(value="00")
+    mins = StringVar(value="00")
+    secs = StringVar(value="00")
+    timers_file = "timers.txt"
 
     # Clock display
-    def clock(self):
+    def clock():
         clock_time = time.strftime('%H:%M:%S %p')
-        self.current_time.config(text=clock_time)
-        self.current_time.after(1000, self.clock)
+        current_time.config(text=clock_time)
+        current_time.after(1000, clock)
+
+    Label(win, font=("arial", 20, "bold"), text="Timer", bg="#FAF3E0", fg="#333333").pack(pady=10)
+    current_time = Label(win, font=("arial", 15, "bold"), text="", fg="#333333", bg="#FAF3E0", width=12)
+    current_time.pack(pady=5)
+    clock()
+
+    #function for validating input (only integers.)
+    def validate_input(newInput):
+        return newInput.isdigit() or newInput == ""
+
+    # Timer input fields
+    vcmd = win.register(validate_input) # Register the validation function with Tkinter
+    timer_frame = Frame(win, bg="#FAF3E0")
+    timer_frame.pack(pady=20)
+    Entry(timer_frame, textvariable=hrs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=0, padx=10)
+    Entry(timer_frame, textvariable=mins, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=1, padx=10)
+    Entry(timer_frame, textvariable=secs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=2, padx=10)
+    Label(timer_frame, text="hours", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=0)
+    Label(timer_frame, text="mins", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=1)
+    Label(timer_frame, text="secs", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=2)
 
     # Timer functionality
-    def timer_alert(self):
+    def timer_alert():
         messagebox.showinfo("Time's Up", "The timer has finished!")
 
-    def start_timer(self):
-        if not self.timer_running:
-            self.timer_running = True
+    def start_timer():
+        global timer_running, paused_time
+        if not timer_running:
+            timer_running = True
+            countdown(int(hrs.get()) * 3600 + int(mins.get()) * 60 + int(secs.get()))
 
-            try:
-                countdown = int(self.hrs.get()) * 3600 + int(self.mins.get()) * 60 + int(self.secs.get())
-            except ValueError:
-                messagebox.showerror("Error", "Invalid input. Please enter a valid time.")
-                self.timer_running = False
-                return
-            
-            self.countdown(countdown)
-
-    def countdown(self, time_left):
-        if time_left < 0 or not self.timer_running:
+    def countdown(time_left):
+        global timer_running, paused_time
+        if time_left < 0 or not timer_running:
             timer_running = False
             return
 
-        self.hrs.set(f"{time_left // 3600:02}")
-        self.mins.set(f"{(time_left % 3600) // 60:02}")
-        self.secs.set(f"{time_left % 60:02}")
+        hrs.set(f"{time_left // 3600:02}")
+        mins.set(f"{(time_left % 3600) // 60:02}")
+        secs.set(f"{time_left % 60:02}")
 
         if time_left == 0:
-            self.timer_alert()  # Trigger alert
+            timer_alert()  # Trigger alert
         else:
-            self.root.after(1000, lambda: self.countdown(time_left - 1))
+            win.after(1000, lambda: countdown(time_left - 1))
 
-    def pause_timer(self):
-        if self.timer_running:
-            self.paused_time = int(self.hrs.get()) * 3600 + int(self.mins.get()) * 60 + int(self.secs.get())
-            self.timer_running = False
+    def pause_timer():
+        global timer_running, paused_time
+        if timer_running:
+            paused_time = int(hrs.get()) * 3600 + int(mins.get()) * 60 + int(secs.get())
+            timer_running = False
 
-    def reset_timer(self):
-        self.timer_running = False
-        self.hrs.set("00"), self.mins.set("00"), self.secs.set("00")
+    def reset_timer():
+        global timer_running
+        timer_running = False
+        hrs.set("00"), mins.set("00"), secs.set("00")
 
     # Save and load timers
-    def save_timer(self):
+    def save_timer():
+        # Check the number of saved timers
+        if os.path.exists(timers_file):
+            with open(timers_file, "r") as file:
+                lines = file.readlines()
+
+            if len(lines) >= 6:  # Limit to 6 timers
+                messagebox.showwarning("Limit Reached", "You can only save up to 6 timers. Please delete one of the timers before you can save another.")
+                return
+
+        # Ask for remark and save the timer
         remark = simpledialog.askstring("Save Timer", "Enter timer remark:")
         if remark:
-            with open(self.timers_file, "a") as file:
-                file.write(f"{remark}:{self.hrs.get()}:{self.mins.get()}:{self.secs.get()}\n")
-            self.load_saved_timers()
+            with open(timers_file, "a") as file:
+                file.write(f"{remark}:{hrs.get()}:{mins.get()}:{secs.get()}\n")
+            load_saved_timers()
+        else:
+             messagebox.showwarning("Empty Input", "Empty timer remark is not allowed! Please enter again.")
 
-    def load_saved_timers(self):
-        if not os.path.exists(self.timers_file):
+    def delete_timer(timer_line):
+        if os.path.exists(timers_file):
+            with open(timers_file, "r") as file:
+                lines = file.readlines()
+
+            with open(timers_file, "w") as file:
+                for line in lines:
+                    if line.strip() != timer_line.strip():
+                        file.write(line)
+
+        load_saved_timers()  # Reloads the Saved timers
+
+    def load_saved_timers():
+        if not os.path.exists(timers_file):
             return
 
-        with open(self.timers_file, "r") as file:
+        with open(timers_file, "r") as file:
             lines = file.readlines()
 
-        for widget in self.saved_timers_frame.winfo_children():
+        for widget in saved_timers_frame.winfo_children():
             widget.destroy()
 
         for line in lines:
             try:
                 remark, h, m, s = line.strip().split(":")
-                Button(
-                    self.saved_timers_frame,
-                    text=remark,
-                    bg="#ea3548",
-                    fg="#fff",
-                    command=lambda h=h, m=m, s=s: self.load_timer(h, m, s)
-                ).pack(pady=2)
+                timer_frame = Frame(saved_timers_frame, bg="#000")
+                timer_frame.pack(pady=2, fill=X)
+
+                # Timer Button (uniform size)
+                Button(timer_frame, text=remark, bg="#ea3548", fg="#fff",
+                    width=15, height=2,  # Set button size
+                    command=lambda h=h, m=m, s=s: load_timer(h, m, s)).pack(side=LEFT, padx=5)
+
+                # Delete Button
+                Button(timer_frame, text="Delete", bg="#ff0000", fg="#fff",
+                    width=8, height=2,  # Set button size
+                    command=lambda line=line: delete_timer(line)).pack(side=LEFT, padx=5)
             except ValueError:
                 continue
 
-    def load_timer(self, h, m, s):
-        self.hrs.set(h)
-        self.mins.set(m)
-        self.secs.set(s)
 
-def timer_start():
-    main_timer = Toplevel()
-    gui = timerrun(main_timer)
+    def load_timer(h, m, s):
+        hrs.set(h)
+        mins.set(m)
+        secs.set(s)
+
+    # Presets area
+    saved_timers_frame = Frame(win, bg="#FAF3E0")
+    saved_timers_frame.pack(pady=10)
+    load_saved_timers()
+
+    # Buttons
+    button_frame = Frame(win, bg="#FAF3E0")
+    button_frame.pack(pady=20)
+    Button(button_frame, text="Start", font=("arial", 9, "bold"), bg="#A1CDA8", fg="#333333", width=10, height=2, command=start_timer).grid(row=0, column=0, padx=5)
+    Button(button_frame, text="Pause", font=("arial", 9, "bold"), bg="#FFABAB", fg="#333333", width=10, height=2, command=pause_timer).grid(row=0, column=1, padx=5)
+    Button(button_frame, text="Reset", font=("arial", 9, "bold"), bg="#FFD6A5", fg="#333333", width=10, height=2, command=reset_timer).grid(row=0, column=2, padx=5)
+    Button(button_frame, text="Save Timer", font=("arial", 9, "bold"), bg="#FFE6A7", fg="#333333", width=10, height=2, command=save_timer).grid(row=0, column=3, padx=5)
+
