@@ -154,7 +154,7 @@ class flashcardQuizzer:
                     mb.showinfo("Success", "Quiz deleted successfully!")
                     self.edit_del_quiz()
             except IndexError:
-                mb.showwarning("No Selection!", "Please select a quiz to delete.")
+                mb.showwarning("No Selection!", "Please select a quiz to edit.")
             
         btn_frame = tk.Frame(self.root)
         btn_frame.pack(pady=20)
