@@ -30,17 +30,24 @@ current_time = Label(win, font=("arial", 15, "bold"), text="", fg="#333333", bg=
 current_time.pack(pady=5)
 clock()
 
-#function for validating input (only integers.)
-def validate_input(newInput):
-    return newInput.isdigit() or newInput == ""
+#function for validating input (only integers and max 99 for hours, 59 for minutes and seconds)
+def validate_input(newInput, field):
+    if newInput.isdigit() and len(newInput) <= 2:
+        if field == 'hrs':
+            return int(newInput) <= 99
+        elif field in ['mins', 'secs']:
+            return int(newInput) <= 59
+    return newInput == ""
 
 # Timer input fields
-vcmd = win.register(validate_input) # Register the validation function with Tkinter
+vcmd_hrs = (win.register(lambda newInput: validate_input(newInput, 'hrs')), "%P")
+vcmd_mins_secs = (win.register(lambda newInput: validate_input(newInput, 'mins')), "%P")
+
 timer_frame = Frame(win, bg="#FAF3E0")
 timer_frame.pack(pady=20)
-Entry(timer_frame, textvariable=hrs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=0, padx=10)
-Entry(timer_frame, textvariable=mins, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=1, padx=10)
-Entry(timer_frame, textvariable=secs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = (vcmd, "%P")).grid(row=0, column=2, padx=10)
+Entry(timer_frame, textvariable=hrs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = vcmd_hrs).grid(row=0, column=0, padx=10)
+Entry(timer_frame, textvariable=mins, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = vcmd_mins_secs).grid(row=0, column=1, padx=10)
+Entry(timer_frame, textvariable=secs, width=2, font="arial 50", bg="#FAF3E0", fg="#333333", bd=0, validate = "key", validatecommand = vcmd_mins_secs).grid(row=0, column=2, padx=10)
 Label(timer_frame, text="hours", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=0)
 Label(timer_frame, text="mins", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=1)
 Label(timer_frame, text="secs", font="arial 12", bg="#FAF3E0", fg="#333333").grid(row=1, column=2)
