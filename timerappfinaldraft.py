@@ -131,7 +131,7 @@ def load_saved_timers():
     for line in lines:
         try:
             remark, h, m, s = line.strip().split(":")
-            timer_frame = Frame(saved_timers_frame, bg="#000")
+            timer_frame = Frame(saved_timers_frame, bg="#FAF3E0")
             timer_frame.pack(pady=2, fill=X)
 
             # Timer Button (uniform size)
