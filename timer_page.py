@@ -11,7 +11,7 @@ def timer_start():
     # Initialize the main application window
     win = Toplevel()
     win.title("Timer App")
-    win.geometry("500x700")
+    win.geometry("500x500+500+90")
     win.config(bg="#FAF3E0")
     win.resizable(False, False)
     
